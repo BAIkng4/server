@@ -1,5 +1,4 @@
 import json, requests, base64
-from discord.ext import commands
 
 # Read config.json
 with open("config.json", "r") as file:
@@ -98,16 +97,3 @@ class GitHubDatabase:
                 print(f"[GitHub DELETE] Failed to fetch file: {response.status_code}")
         except Exception as e:
             print(f"[GitHub DELETE] Exception: {e}")
-            
-class GitHubDatabaseHandler(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-        github_config = config["database"]["github"]
-        github_token = github_config["github_token"]
-        github_username = github_config["github_username"]
-        github_repositories = github_config["github_repositories"]
-        
-        bot.backup_db = GitHubDatabase(token=github_token, username=github_username, repositories_name=github_repositories)
-     
-async def setup(bot):
-    await bot.add_cog(GitHubDatabaseHandler(bot))
