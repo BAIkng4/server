@@ -29,5 +29,3 @@ def hello():
         result.append(doc)
 
     return jsonify(result)
-    
-app.run()
