@@ -3,19 +3,24 @@ from pymongo import MongoClient
 import os
 
 app = Flask(__name__)
+mongodb_token = "mongodb+srv://gksbot:gttopia01@datacluster.cn2geam.mongodb.net/"
 
-# Ambil URL MongoDB dari environment variable (Railway menyediakannya)
-mongo_uri = os.getenv("mongodb+srv://gksbot:gttopia01@datacluster.cn2geam.mongodb.net/")  # variabel ini kamu isi di Railway
-client = MongoClient(mongo_uri)
+try:
+    mongodb_client = MongoClient(mongodb_token)
+    mongodb_name = mongodb_client["gks_bot"]
+    mongodb_name.list_collection_names()
+    
+    mongodb_user_collection = mongodb_name["user_data"]
 
-# Ganti sesuai nama database dan koleksi kamu
-db = client["gks_bot"]
-collection = db["user_data"]
-
+    print("Successfully connected to the main database!")
+except Exception as e:
+    print(f"Failed to connect to the main database: {e}")
+    exit()
+    
 @app.route('/')
 def hello():
     # Ambil data dari koleksi MongoDB
-    documents = collection.find()
+    documents = mongodb_user_collection.find()
     
     # Ubah ke bentuk list agar bisa ditampilkan
     result = []
@@ -24,3 +29,5 @@ def hello():
         result.append(doc)
 
     return jsonify(result)
+    
+app.run()
