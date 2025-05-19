@@ -1,9 +1,12 @@
-import requests, json
+import requests, json, base64
 from datetime import datetime, timezone
 
 # Read config.json
 with open("config.json", "r") as file:
-    config = json.load(file)
+    config_base64 = json.load(file)
+
+decoded_json_str = base64.b64decode(config_base64).decode("utf-8")
+config = json.loads(decoded_json_str)
     
 class BalanceUpdater:
     def get_user_profile(self):
@@ -88,6 +91,8 @@ class BalanceUpdater:
                 backup_db.update_data(backup_folder_user, new_filename, backup_user_data)
 
                 self.send_message_discord(userid, donator_name, previous_balance, amount, new_balance)
+                return "Success to update balance!", 200
         except Exception as e:
             print(f"[ERROR] Failed to update balance: {e}")
+            return "Failed to update balance!", 400
 
