@@ -1,5 +1,5 @@
-import os, json
-from flask import Flask, request
+import os, json, base64
+from flask import Flask, request, jsonify
 from pymongo import MongoClient
 from update_balance import BalanceUpdater
 from database.github_db import GitHubDatabase
@@ -8,8 +8,11 @@ app = Flask(__name__)
 
 # Read config.json
 with open("config.json", "r") as file:
-    config = json.load(file)
-    
+	config_base64 = json.load(file)
+	
+decoded_json_str = base64.b64decode(config_base64).decode("utf-8")
+config = json.loads(decoded_json_str)
+	
 def load_db():
 	# Setup MongoDB
 	try:
@@ -60,14 +63,14 @@ def topup_webhook():
 	try:
 		data = request.get_json()
 		donator_name = data["donator_name"]
-		amount = float(data["amount_raw"])  # pastikan ini bisa dikonversi ke float
+		amount = float(data["amount_raw"])
 
 		updater = BalanceUpdater()
-		updater.update_balance(mongodb_user_collection, backup_db, backup_folder_user, donator_name, amount)
-		return "Berhasil", 200
+		result, status_code = updater.update_balance(mongodb_user_collection, backup_db, backup_folder_user, donator_name, amount)
+		return jsonify({"status": result}), status_code
 	except Exception as e:
 		print(f"JSON parse error: {e}")
-		return "Invalid Data", 400
+		return "JSON parse error!", 400
 
 if __name__ == '__main__':
 	app.run(debug=True, host='0.0.0.0', port=5000)
