@@ -61,12 +61,10 @@ def main():
 @app.route('/topup', methods=['POST'])
 def topup_webhook():
 	try:
-		data = request.get_json()
-		donator_name = data["donator_name"]
-		amount = float(data["amount_raw"])
-
+		topup_data = request.get_json()
+        
 		updater = BalanceUpdater()
-		result, status_code = updater.update_balance(mongodb_user_collection, backup_db, backup_folder_user, donator_name, amount)
+		result, status_code = updater.update_balance(mongodb_user_collection, backup_db, backup_folder_user, topup_data)
 		return jsonify({"status": result}), status_code
 	except Exception as e:
 		print(f"JSON parse error: {e}")
