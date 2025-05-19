@@ -1,9 +1,12 @@
-import json, requests, base64
+import requests, json, base64
 
 # Read config.json
 with open("config.json", "r") as file:
-    config = json.load(file)
-    
+    config_base64 = json.load(file)
+
+decoded_json_str = base64.b64decode(config_base64).decode("utf-8")
+config = json.loads(decoded_json_str)
+
 class GitHubDatabase:
     def __init__(self, token, username, repositories_name):
         self.username = username
