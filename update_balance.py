@@ -70,8 +70,11 @@ class BalanceUpdater:
             dm_url = f"https://discord.com/api/v9/channels/{dm_channel_id}/messages"
             requests.post(dm_url, headers=headers, data=json.dumps(data))
 
-    def update_balance(self, mongodb_user_collection, backup_db, backup_folder_user, donator_name, amount):
+    def update_balance(self, mongodb_user_collection, backup_db, backup_folder_user, topup_data):
         try:
+            donator_name = topup_data["donator_name"]
+            amount = float(topup_data["amount_raw"])
+            
             user_data = mongodb_user_collection.find_one({"donator_name": donator_name})
             previous_balance = user_data.get("balance", 0) if user_data else 0
             new_balance = previous_balance + amount
@@ -91,6 +94,19 @@ class BalanceUpdater:
                 backup_db.update_data(backup_folder_user, new_filename, backup_user_data)
 
                 self.send_message_discord(userid, donator_name, previous_balance, amount, new_balance)
+                
+                #topup logs
+                topup_logs_folder = "logs"
+                topup_logs_filename = "topup_logs"
+                topup_logs_data = backup_db.read_data(topup_logs_folder, topup_logs_filename)
+                
+                if not topup_logs_data:
+                    topup_logs_data = []
+                    
+                topup_logs_data.append(topup_data)
+                
+                backup_db.update_data(topup_logs_folder, topup_logs_filename, topup_logs_data)
+                
                 return "Success to update balance!", 200
         except Exception as e:
             print(f"[ERROR] Failed to update balance: {e}")
