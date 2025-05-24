@@ -65,7 +65,7 @@ class BalanceUpdater:
             }
         ]
         
-        if saweria_rate >= 0:
+        if saweria_rate is not None and saweria_rate >= 0:
             fields.append({
                 "name": ":abacus: Balance Calculation", 
                 "value": ( 
