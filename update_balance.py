@@ -53,28 +53,32 @@ class BalanceUpdater:
         log_channel_id = config["channel_id_logs"]["balance_logs"]
         dm_channel_id = self.get_dm_channel_id(discord_userid)
         
+        fields = [
+            {
+                "name": "<:GKS_Balance:1135755520008015902> Balance Details", 
+                "value": ( 
+                    f"**Previous balance**: {previous_balance} <:WL:1124725498363256937>\n"
+                    f"**Balance change**: {balance_change} <:WL:1124725498363256937>\n"
+                    f"**Current balance**: {new_balance} <:WL:1124725498363256937>"
+                ),
+                "inline": False
+            }
+        ]
+        
+        if saweria_rate >= 0:
+            fields.append({
+                "name": ":abacus: Balance Calculation", 
+                "value": ( 
+                    f"**Calculation**: `Rp{amount_raw:,.2f}`/`Rp{saweria_rate:,.2f}` = {balance_change} <:WL:1124725498363256937>"
+                ),
+                "inline": False
+            })
+            
         embed = {
             "title": f"{discord_name} Balance",
             "description": "Thank you for topping up your balance.",
             "color": int("03fc30", 16),
-            "fields": [
-                {
-                    "name": "<:GKS_Balance:1135755520008015902> Balance Details", 
-                    "value": ( 
-                        f"**Previous balance**: {previous_balance} <:WL:1124725498363256937>\n"
-                        f"**Balance change**: {balance_change} <:WL:1124725498363256937>\n"
-                        f"**Current balance**: {new_balance} <:WL:1124725498363256937>"
-                    ),
-                    "inline": False
-                },
-                {
-                    "name": ":abacus: Balance Calculation", 
-                    "value": ( 
-                        f"**Calculation**: `Rp{amount_raw:,.2f}`/`Rp{saweria_rate:,.2f}` = {balance_change} <:WL:1124725498363256937>"
-                    ),
-                    "inline": False
-                }
-            ],
+            "fields": fields,
             "footer": {"text": bot_name, "icon_url": avatar},
             "timestamp": datetime.utcnow().replace(tzinfo=timezone.utc).isoformat()
         }
@@ -127,7 +131,7 @@ class BalanceUpdater:
                     saweria_rate = float(payment_data.get("saweria_rate", 0)) if payment_data else float(0)
                     amount = value_rounding(amount_raw / saweria_rate)
                 else:
-                    saweria_rate = float(0)
+                    saweria_rate = None
                     amount = value_rounding(amount_raw)
             
             discord_name = user_data.get('discord_name', username) if user_data else username
