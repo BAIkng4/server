@@ -70,7 +70,7 @@ class BalanceUpdater:
                 {
                     "name": ":abacus: Balance Calculation", 
                     "value": ( 
-                        f"**Calculation**: `Rp{amount_raw:,.2f}` / `Rp{saweria_rate:,.2f}` = {balance_change} <:WL:1124725498363256937>"
+                        f"**Calculation**: `Rp{amount_raw:,.2f}`/`Rp{saweria_rate:,.2f}` = {balance_change} <:WL:1124725498363256937>"
                     ),
                     "inline": False
                 }
