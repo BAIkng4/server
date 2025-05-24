@@ -48,7 +48,7 @@ class BalanceUpdater:
             print("Failed to fetch Discord channel id:", response.status_code, response.text)
             return ""
         
-    def send_message_discord(self, discord_name, discord_userid, previous_balance, balance_change, new_balance):
+    def send_message_discord(self, discord_name, discord_userid, previous_balance, balance_change, new_balance, amount_raw, saweria_rate):
         bot_name, avatar = self.get_user_profile()
         log_channel_id = config["channel_id_logs"]["balance_logs"]
         dm_channel_id = self.get_dm_channel_id(discord_userid)
@@ -59,11 +59,18 @@ class BalanceUpdater:
             "color": int("03fc30", 16),
             "fields": [
                 {
-                    "name": "Previous Balance", 
+                    "name": "<:GKS_Balance:1135755520008015902> Balance Details", 
                     "value": ( 
                         f"**Previous balance**: {previous_balance} <:WL:1124725498363256937>\n"
                         f"**Balance change**: {balance_change} <:WL:1124725498363256937>\n"
                         f"**Current balance**: {new_balance} <:WL:1124725498363256937>"
+                    ),
+                    "inline": False
+                },
+                {
+                    "name": ":abacus: Balance Calculation", 
+                    "value": ( 
+                        f"**Calculation**: {amount_raw} / {saweria_rate} = {balance_change} <:WL:1124725498363256937>"
                     ),
                     "inline": False
                 }
@@ -139,10 +146,10 @@ class BalanceUpdater:
                 new_filename = f"{backup_user_data.get('discord_userid', 0)}_{backup_user_data.get('login_code', 0)}"
                 backup_db.update_data(backup_folder_user, new_filename, backup_user_data)
 
-                self.send_message_discord(discord_name.title(), discord_userid, previous_balance, amount, new_balance)
+                self.send_message_discord(discord_name.title(), discord_userid, previous_balance, amount, new_balance, amount_raw, saweria_rate)
                 return "Success to update balance!", 200
             else:
-                self.send_message_discord(discord_name.title(), discord_userid, previous_balance, amount, new_balance)
+                self.send_message_discord(discord_name.title(), discord_userid, previous_balance, amount, new_balance, amount_raw, saweria_rate)
         except Exception as e:
             print(f"[ERROR] Failed to update balance: {e}")
             return "Failed to update balance!", 400
