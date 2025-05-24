@@ -123,10 +123,11 @@ class BalanceUpdater:
             backup_db.update_data(topup_logs_folder, topup_logs_filename, topup_logs_data)
             
             if payment_data:
-                saweria_rate = float(payment_data.get("saweria_rate", 0)) if payment_data else float(0)
                 if donator_email:
+                    saweria_rate = float(payment_data.get("saweria_rate", 0)) if payment_data else float(0)
                     amount = value_rounding(amount_raw / saweria_rate)
                 else:
+                    saweria_rate = float(0)
                     amount = value_rounding(amount_raw)
             
             discord_name = user_data.get('discord_name', username) if user_data else username
