@@ -142,7 +142,7 @@ class BalanceUpdater:
                 self.send_message_discord(discord_name.title(), discord_userid, previous_balance, amount, new_balance)
                 return "Success to update balance!", 200
             else:
-                send_message_discord(discord_name.title(), discord_userid, previous_balance, amount, new_balance)
+                self.send_message_discord(discord_name.title(), discord_userid, previous_balance, amount, new_balance)
         except Exception as e:
             print(f"[ERROR] Failed to update balance: {e}")
             return "Failed to update balance!", 400
